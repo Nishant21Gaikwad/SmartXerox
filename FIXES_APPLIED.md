@@ -210,7 +210,7 @@ app.use((err, req, res, next) => {
 ```env
 NODE_ENV=production
 PORT=5000
-SUPABASE_URL=https://mudfaoyxjyemwwonkcgl.supabase.co
+SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your-key
 SUPABASE_SERVICE_KEY=your-key
 JWT_SECRET=f27b12c216ac2cc8ce3b389d4a90abcad2dd14e03e24c3ed51aeac49203da64a9c4a8dbaceaa62d9c12ae8a5b33535c32a18b84049ef5b2a25c5fd81b7b430c6

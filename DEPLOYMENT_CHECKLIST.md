@@ -207,7 +207,7 @@ NODE_ENV=production
 PORT=5000
 
 # Supabase
-SUPABASE_URL=https://mudfaoyxjyemwwonkcgl.supabase.co
+SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=<your-anon-key>
 SUPABASE_SERVICE_KEY=<your-service-key>
 
