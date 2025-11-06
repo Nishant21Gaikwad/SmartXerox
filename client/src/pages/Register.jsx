@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -15,6 +15,14 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Redirect to student panel if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('smartxerox_token');
+    if (token) {
+      navigate('/student');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({
