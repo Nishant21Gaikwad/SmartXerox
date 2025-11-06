@@ -97,8 +97,8 @@ npm ERR! ERESOLVE unable to resolve dependency tree
 **Solutions**:
 1. **Check `.env` file**:
    ```env
-   ADMIN_EMAIL=admin@smartxerox.com
-   ADMIN_PASSWORD=admin123
+   ADMIN_EMAIL=your-admin-email@domain.com
+   ADMIN_PASSWORD=your-admin-password
    ```
 
 2. **Restart server** after changing `.env`:

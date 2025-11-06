@@ -84,8 +84,8 @@ smartxerox/
    SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_KEY=your_supabase_service_key
    JWT_SECRET=your_jwt_secret
-   ADMIN_EMAIL=admin@smartxerox.com
-   ADMIN_PASSWORD=admin123
+   ADMIN_EMAIL=your-admin-email@domain.com
+   ADMIN_PASSWORD=your-admin-password
    ```
    
    Create `.env` in the `client/` folder:

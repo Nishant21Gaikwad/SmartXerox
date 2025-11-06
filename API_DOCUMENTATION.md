@@ -106,8 +106,8 @@ Authorization: Bearer <token>
 **Body**:
 ```json
 {
-  "email": "admin@smartxerox.com",
-  "password": "admin123"
+  "email": "your-admin-email@domain.com",
+  "password": "your-admin-password"
 }
 ```
 
@@ -118,7 +118,7 @@ Authorization: Bearer <token>
   "message": "Login successful",
   "data": {
     "token": "jwt_token_here",
-    "email": "admin@smartxerox.com",
+    "email": "your-admin-email@domain.com",
     "role": "admin"
   }
 }
@@ -260,8 +260,8 @@ const loginRes = await fetch('http://localhost:5000/api/admin/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    email: 'admin@smartxerox.com',
-    password: 'admin123'
+    email: 'your-admin-email@domain.com',
+    password: 'your-admin-password'
   })
 });
 

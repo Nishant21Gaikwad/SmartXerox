@@ -121,8 +121,8 @@ SUPABASE_URL=https://xxxxxxxxxxxxx.supabase.co
 SUPABASE_ANON_KEY=eyJhbGc...your-anon-key
 SUPABASE_SERVICE_KEY=eyJhbGc...your-service-key
 JWT_SECRET=change-this-to-a-random-string-abc123xyz789
-ADMIN_EMAIL=admin@smartxerox.com
-ADMIN_PASSWORD=admin123
+ADMIN_EMAIL=your-admin-email@domain.com
+ADMIN_PASSWORD=your-admin-password
 NODE_ENV=development
 ```
 
@@ -168,8 +168,8 @@ npm run dev
 2. You should see the Student Panel
 3. Try uploading a test file
 4. Go to http://localhost:5173/admin/login
-   - Email: `admin@smartxerox.com`
-   - Password: `admin123`
+   - Email: Use your configured admin email
+   - Password: Use your configured admin password
 
 ---
 
@@ -245,7 +245,7 @@ npm run dev
 
 ### Issue: "Admin login fails"
 - ✅ Verify `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`
-- ✅ Use exact credentials: `admin@smartxerox.com` / `admin123`
+- ✅ Use exact credentials from your .env file
 
 ### Issue: "File upload stuck"
 - ✅ Check file size is under 10MB

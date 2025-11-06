@@ -52,8 +52,8 @@
 **Steps**:
 1. Navigate to http://localhost:5173/admin/login
 2. Enter admin credentials:
-   - Email: "admin@smartxerox.com"
-   - Password: "smartadmin@675."
+   - Email: "your-admin-email@domain.com"
+   - Password: "your-admin-password"
 3. Click "Login" button
 4. Verify redirect to /admin/dashboard
 
@@ -325,8 +325,8 @@
 **Body**:
 ```json
 {
-  "email": "admin@smartxerox.com",
-  "password": "smartadmin@675."
+  "email": "your-admin-email@domain.com",
+  "password": "your-admin-password"
 }
 ```
 **Expected**: 200 OK, admin JWT token

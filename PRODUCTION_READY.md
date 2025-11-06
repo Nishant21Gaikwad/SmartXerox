@@ -170,8 +170,8 @@ SUPABASE_URL=<your-url>
 SUPABASE_ANON_KEY=<your-key>
 SUPABASE_SERVICE_KEY=<your-key>
 JWT_SECRET=<generated-secret>
-ADMIN_EMAIL=admin@smartxerox.com
-ADMIN_PASSWORD=smartadmin@675.
+ADMIN_EMAIL=your-admin-email@domain.com
+ADMIN_PASSWORD=your-strong-admin-password
 FRONTEND_URL=<your-vercel-url>
 ```
 

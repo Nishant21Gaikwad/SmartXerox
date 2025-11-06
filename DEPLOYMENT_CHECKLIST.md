@@ -215,8 +215,8 @@ SUPABASE_SERVICE_KEY=<your-service-key>
 JWT_SECRET=<your-new-secret-here>
 
 # Admin
-ADMIN_EMAIL=admin@smartxerox.com
-ADMIN_PASSWORD=smartadmin@675.
+ADMIN_EMAIL=your-admin-email@domain.com
+ADMIN_PASSWORD=your-strong-admin-password
 
 # Frontend
 FRONTEND_URL=https://your-frontend-domain.vercel.app

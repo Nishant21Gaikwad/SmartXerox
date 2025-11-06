@@ -38,8 +38,8 @@ SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=eyJhbGci...your-key-here
 SUPABASE_SERVICE_KEY=eyJhbGci...your-key-here
 JWT_SECRET=f27b12c216ac2cc8ce3b389d4a90abcad2dd14e03e24c3ed51aeac49203da64a9c4a8dbaceaa62d9c12ae8a5b33535c32a18b84049ef5b2a25c5fd81b7b430c6
-ADMIN_EMAIL=admin@smartxerox.com
-ADMIN_PASSWORD=smartadmin@675.
+ADMIN_EMAIL=your-admin-email@domain.com
+ADMIN_PASSWORD=your-strong-admin-password
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -148,7 +148,7 @@ Should load the landing page
 
 4. **Admin Login:**
    - Go to `/admin/login`
-   - Use: `admin@smartxerox.com` / `smartadmin@675.`
+   - Use your admin credentials
    - Should see dashboard
 
 5. **Admin Features:**

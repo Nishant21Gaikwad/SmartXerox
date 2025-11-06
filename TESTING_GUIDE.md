@@ -75,7 +75,7 @@ Before using automated testing, ensure these work manually:
 - [ ] Delete order works
 
 ### ✅ Admin Panel
-- [ ] Login with admin credentials (admin@smartxerox.com / smartadmin@675.)
+- [ ] Login with admin credentials (use your admin email and password)
 - [ ] View all orders
 - [ ] Filter by status
 - [ ] Update single order status
@@ -232,8 +232,8 @@ await cleanupExpiredOrders();
 ### Valid Admin Credentials
 ```json
 {
-  "email": "admin@smartxerox.com",
-  "password": "smartadmin@675."
+  "email": "your-admin-email@domain.com",
+  "password": "your-admin-password"
 }
 ```
 

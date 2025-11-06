@@ -65,7 +65,7 @@ const AdminLogin = () => {
                 onChange={handleInputChange}
                 className="input"
                 required
-                placeholder="admin@smartxerox.com"
+                placeholder="Enter admin email"
               />
             </div>
 

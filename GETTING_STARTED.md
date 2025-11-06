@@ -243,8 +243,8 @@ npm run dev
 
 ```
 1. Login:
-   ✓ Email: admin@smartxerox.com
-   ✓ Password: admin123
+   ✓ Email: your-admin-email (from .env)
+   ✓ Password: your-admin-password (from .env)
 
 2. Dashboard:
    ✓ See all orders
@@ -454,8 +454,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### Can't login as admin?
 ```powershell
 ✓ Check credentials in server/.env:
-  ADMIN_EMAIL=admin@smartxerox.com
-  ADMIN_PASSWORD=admin123
+  ADMIN_EMAIL=your-admin-email@domain.com
+  ADMIN_PASSWORD=your-admin-password
 ✓ Restart backend server
 ✓ Clear browser localStorage
 ```

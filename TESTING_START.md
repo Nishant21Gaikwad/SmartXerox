@@ -54,8 +54,8 @@ Start with these critical tests:
 ```
 1. Open http://localhost:5173/admin/login
 2. Login with:
-   - Email: admin@smartxerox.com
-   - Password: smartadmin@675.
+   - Email: your-admin-email@domain.com
+   - Password: your-admin-password
 3. Verify you see all orders
 4. Find a group with multiple files
 5. Click bulk status button (e.g., "Printing")
