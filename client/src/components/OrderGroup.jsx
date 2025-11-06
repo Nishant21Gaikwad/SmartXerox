@@ -92,15 +92,15 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
       {groupedOrders.map((group, groupIndex) => (
         <div key={groupIndex} className="card hover:shadow-lg transition-shadow">
           {/* Student Header */}
-          <div className="border-b pb-3 mb-3">
-            <div className="flex justify-between items-start">
+          <div className="border-b pb-2 sm:pb-3 mb-2 sm:mb-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-0">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{group.student_name}</h3>
-                <p className="text-sm text-gray-600">{group.phone_number}</p>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{group.student_name}</h3>
+                <p className="text-xs sm:text-sm text-gray-600">{group.phone_number}</p>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-xs text-gray-500">Submitted</p>
-                <p className="text-sm font-medium">{formatDate(group.created_at)}</p>
+                <p className="text-xs sm:text-sm font-medium">{formatDate(group.created_at)}</p>
                 <p className="text-xs text-orange-600 font-medium mt-1">
                   ⏱️ {getTimeRemaining(group.created_at)}
                 </p>
@@ -109,33 +109,33 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
 
             {/* Bulk Status Update for Admin (only for multiple files) */}
             {isAdmin && group.orders.length > 1 && (
-              <div className="mt-3 pt-3 border-t bg-blue-50 -mx-4 px-4 py-2 rounded-b-lg">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-700">
+              <div className="mt-3 pt-3 border-t bg-blue-50 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 rounded-b-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
                     🔄 Update all {group.orders.length} files:
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => handleBulkStatusChange(group, 'In Queue')}
-                      className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                      className="text-xs px-2 sm:px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
                     >
                       In Queue
                     </button>
                     <button
                       onClick={() => handleBulkStatusChange(group, 'Printing')}
-                      className="text-xs px-3 py-1 bg-blue-200 hover:bg-blue-300 rounded transition-colors"
+                      className="text-xs px-2 sm:px-3 py-1 bg-blue-200 hover:bg-blue-300 rounded transition-colors"
                     >
                       Printing
                     </button>
                     <button
                       onClick={() => handleBulkStatusChange(group, 'Ready')}
-                      className="text-xs px-3 py-1 bg-green-200 hover:bg-green-300 rounded transition-colors"
+                      className="text-xs px-2 sm:px-3 py-1 bg-green-200 hover:bg-green-300 rounded transition-colors"
                     >
                       Ready
                     </button>
                     <button
                       onClick={() => handleBulkStatusChange(group, 'Delivered')}
-                      className="text-xs px-3 py-1 bg-purple-200 hover:bg-purple-300 rounded transition-colors"
+                      className="text-xs px-2 sm:px-3 py-1 bg-purple-200 hover:bg-purple-300 rounded transition-colors"
                     >
                       Delivered
                     </button>
@@ -148,11 +148,11 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
           {/* Files List */}
           <div className="space-y-2">
             {group.orders.map((order, orderIndex) => (
-              <div key={order.id} className="bg-gray-50 rounded-lg p-3">
+              <div key={order.id} className="bg-gray-50 rounded-lg p-2 sm:p-3">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs sm:text-sm font-medium text-gray-700">
                         File {orderIndex + 1}
                       </span>
                       <StatusBadge status={order.status} />
@@ -163,7 +163,7 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
                     <select
                       value={order.status}
                       onChange={(e) => window.updateOrderStatus && window.updateOrderStatus(order.id, e.target.value)}
-                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent ml-2"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <option value="In Queue">In Queue</option>
@@ -190,24 +190,24 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
                     <a
                       href={order.file_url}
                       download
-                      className="text-xs btn btn-primary flex-1 text-center py-1"
+                      className="text-xs btn btn-primary flex-1 text-center py-1.5 sm:py-1"
                     >
-                      📥 Download File
+                      📥 Download
                     </a>
                   ) : (
                     <a
                       href={order.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs btn btn-primary flex-1 text-center py-1"
+                      className="text-xs btn btn-primary flex-1 text-center py-1.5 sm:py-1"
                     >
-                      📥 View File
+                      📥 View
                     </a>
                   )}
                   {showDelete && onDelete && (
                     <button
                       onClick={() => onDelete(order.id)}
-                      className="text-xs btn btn-danger py-1 px-3"
+                      className="text-xs btn btn-danger py-1.5 sm:py-1 px-2 sm:px-3"
                     >
                       Delete
                     </button>

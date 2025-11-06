@@ -187,38 +187,38 @@ const StudentPanel = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Upload Form */}
           <div>
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">📤 Submit New Order</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">📤 Submit New Order</h2>
             
             {error && (
-              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <div className="mb-4 p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm whitespace-pre-line">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+              <div className="mb-4 p-3 sm:p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
                 {success}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="card space-y-4">
+            <form onSubmit={handleSubmit} className="card space-y-3 sm:space-y-4">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium text-gray-700">Your Information</h3>
+                <h3 className="text-xs sm:text-sm font-medium text-gray-700">Your Information</h3>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="text-xs text-red-600 hover:text-red-800"
+                  className="text-xs text-red-600 hover:text-red-800 px-2 py-1"
                 >
                   Logout
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                   Your Name
                 </label>
                 <input
@@ -226,14 +226,14 @@ const StudentPanel = () => {
                   name="student_name"
                   value={formData.student_name}
                   onChange={handleInputChange}
-                  className="input bg-gray-100"
+                  className="input bg-gray-100 text-sm sm:text-base"
                   disabled
                   placeholder="Enter your name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                   Phone Number
                 </label>
                 <input
@@ -241,7 +241,7 @@ const StudentPanel = () => {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
-                  className="input bg-gray-100"
+                  className="input bg-gray-100 text-sm sm:text-base"
                   disabled
                   placeholder="Enter your phone number"
                   pattern="[0-9]{10}"
@@ -249,19 +249,19 @@ const StudentPanel = () => {
                 />
               </div>
 
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Add Files to Upload</h3>
+              <div className="border-t pt-3 sm:pt-4">
+                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Add Files to Upload</h3>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                   📎 Select Files (PDF, JPG, PNG - Max 10MB each)
                 </label>
                 <input
                   id="fileInput"
                   type="file"
                   onChange={handleFileChange}
-                  className="input"
+                  className="input text-sm sm:text-base"
                   accept=".pdf,.jpg,.jpeg,.png"
                   multiple
                 />
@@ -272,23 +272,23 @@ const StudentPanel = () => {
 
               {/* Files List */}
               {filesList.length > 0 && (
-                <div className="border rounded-lg p-4 space-y-3 max-h-96 overflow-y-auto">
-                  <h4 className="font-medium text-gray-900 flex items-center justify-between">
+                <div className="border rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-96 overflow-y-auto">
+                  <h4 className="text-sm sm:text-base font-medium text-gray-900 flex items-center justify-between">
                     <span>Files to Upload ({filesList.length})</span>
                     <button
                       type="button"
                       onClick={() => setFilesList([])}
-                      className="text-xs text-red-600 hover:text-red-800"
+                      className="text-xs text-red-600 hover:text-red-800 px-2 py-1"
                     >
                       Clear All
                     </button>
                   </h4>
                   
                   {filesList.map((fileItem) => (
-                    <div key={fileItem.id} className="bg-gray-50 rounded p-3 space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 break-all">
+                    <div key={fileItem.id} className="bg-gray-50 rounded p-2 sm:p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 break-all">
                             📄 {fileItem.file.name}
                           </p>
                           <p className="text-xs text-gray-500">
@@ -298,7 +298,7 @@ const StudentPanel = () => {
                         <button
                           type="button"
                           onClick={() => removeFile(fileItem.id)}
-                          className="ml-2 text-red-600 hover:text-red-800"
+                          className="flex-shrink-0 text-red-600 hover:text-red-800 text-lg"
                           title="Remove file"
                         >
                           ✕
@@ -312,7 +312,7 @@ const StudentPanel = () => {
                             type="number"
                             value={fileItem.copies}
                             onChange={(e) => updateFileSettings(fileItem.id, 'copies', parseInt(e.target.value))}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                             min="1"
                             max="100"
                           />
@@ -322,7 +322,7 @@ const StudentPanel = () => {
                           <select
                             value={fileItem.color_type}
                             onChange={(e) => updateFileSettings(fileItem.id, 'color_type', e.target.value)}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="B&W">B&W</option>
                             <option value="Color">Color</option>
@@ -337,7 +337,7 @@ const StudentPanel = () => {
               <button
                 type="submit"
                 disabled={loading || filesList.length === 0}
-                className={`btn w-full ${filesList.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'btn-primary'}`}
+                className={`btn w-full text-sm sm:text-base ${filesList.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'btn-primary'}`}
               >
                 {loading ? 'Uploading...' : `📤 Submit ${filesList.length > 0 ? `${filesList.length} Order(s)` : 'Orders'}`}
               </button>
@@ -358,21 +358,21 @@ const StudentPanel = () => {
 
           {/* My Orders */}
           <div>
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">📋 My Orders</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">📋 My Orders</h2>
 
             {loading ? (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="mt-2 text-gray-600">Loading orders...</p>
+                <p className="mt-2 text-sm sm:text-base text-gray-600">Loading orders...</p>
               </div>
             ) : orders.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <OrderGroup orders={orders} onDelete={handleDeleteOrder} showDelete={true} />
               </div>
             ) : (
-              <div className="card text-center py-8 text-gray-500">
-                <p className="mb-2">📭 No orders yet</p>
-                <p className="text-sm">Upload files to create your first order</p>
+              <div className="card text-center py-6 sm:py-8 text-gray-500">
+                <p className="mb-2 text-sm sm:text-base">📭 No orders yet</p>
+                <p className="text-xs sm:text-sm">Upload files to create your first order</p>
               </div>
             )}
           </div>

@@ -18,38 +18,34 @@ const Navbar = ({ isAdmin = false, onLogout = null }) => {
 
   return (
     <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600">📄 SmartXerox</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">📄 SmartXerox</h1>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
             {isAdmin ? (
               <>
-                <span className="text-sm text-gray-600">Admin Panel</span>
+                <span className="hidden sm:inline text-xs sm:text-sm text-gray-600">Admin Panel</span>
                 <button
                   onClick={onLogout}
-                  className="btn btn-secondary text-sm"
+                  className="btn btn-secondary text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
                 >
                   Logout
                 </button>
               </>
             ) : isLoggedIn && user.name ? (
               <>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">👤 {user.name}</p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
-                </div>
                 <button
                   onClick={handleLogout}
-                  className="btn btn-secondary text-sm"
+                  className="btn btn-secondary text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <a href="/admin" className="text-sm text-blue-600 hover:text-blue-800">
+              <a href="/admin" className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap">
                 Admin Login
               </a>
             )}

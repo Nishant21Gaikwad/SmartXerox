@@ -90,45 +90,45 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar isAdmin={true} onLogout={handleLogout} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-3xl font-bold mb-6 text-gray-900">🛠️ Admin Dashboard</h2>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-900">🛠️ Admin Dashboard</h2>
 
         {/* Statistics Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div className="card">
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Total Orders</h3>
-              <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Orders</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.total}</p>
             </div>
             <div className="card">
-              <h3 className="text-sm font-medium text-gray-600 mb-1">In Queue</h3>
-              <p className="text-3xl font-bold text-gray-600">{stats.byStatus['In Queue']}</p>
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">In Queue</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-600">{stats.byStatus['In Queue']}</p>
             </div>
             <div className="card">
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Ready</h3>
-              <p className="text-3xl font-bold text-green-600">{stats.byStatus['Ready']}</p>
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Ready</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600">{stats.byStatus['Ready']}</p>
             </div>
             <div className="card">
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Total Copies</h3>
-              <p className="text-3xl font-bold text-purple-600">{stats.totalCopies}</p>
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Copies</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-purple-600">{stats.totalCopies}</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <div className="mb-4 p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
             {error}
           </div>
         )}
 
         {/* Filter Controls */}
-        <div className="card mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <span className="font-medium text-gray-700">Filter by Status:</span>
+        <div className="card mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center">
+            <span className="font-medium text-gray-700 text-sm sm:text-base">Filter by Status:</span>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="input max-w-xs"
+              className="input flex-1 sm:max-w-xs text-sm sm:text-base"
             >
               <option value="">All Orders</option>
               <option value="In Queue">In Queue</option>
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
               <option value="Ready">Ready</option>
               <option value="Delivered">Delivered</option>
             </select>
-            <button onClick={fetchOrders} className="btn btn-primary">
+            <button onClick={fetchOrders} className="btn btn-primary text-sm sm:text-base">
               🔄 Refresh
             </button>
           </div>
@@ -145,15 +145,15 @@ const AdminDashboard = () => {
         {/* Orders List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Loading orders...</p>
+            <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-sm sm:text-base text-gray-600">Loading orders...</p>
           </div>
         ) : orders.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <OrderGroup orders={orders} showDelete={false} isAdmin={true} />
           </div>
         ) : (
-          <div className="card text-center py-12 text-gray-500">
+          <div className="card text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
             No orders found
           </div>
         )}
