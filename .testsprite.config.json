@@ -1,0 +1,94 @@
+{
+  "projectName": "SmartXerox",
+  "testEnvironment": {
+    "frontend": "http://localhost:5173",
+    "backend": "http://localhost:5000",
+    "database": "Supabase PostgreSQL"
+  },
+  "testScenarios": [
+    {
+      "name": "Student Registration Flow",
+      "steps": [
+        "Navigate to /register",
+        "Fill registration form (name, email, phone, password)",
+        "Submit form",
+        "Verify redirect to /login",
+        "Verify success message"
+      ]
+    },
+    {
+      "name": "Student Login Flow",
+      "steps": [
+        "Navigate to /login",
+        "Enter valid credentials",
+        "Submit login form",
+        "Verify redirect to /student",
+        "Verify user info displayed in navbar"
+      ]
+    },
+    {
+      "name": "File Upload Flow",
+      "steps": [
+        "Login as student",
+        "Navigate to /student",
+        "Select multiple files (PDF/JPG/PNG)",
+        "Set copies and color type for each file",
+        "Submit order",
+        "Verify success message",
+        "Verify orders appear in 'My Orders' section"
+      ]
+    },
+    {
+      "name": "Order Tracking",
+      "steps": [
+        "Login as student",
+        "View 'My Orders' section",
+        "Verify grouped orders display",
+        "Verify status badges",
+        "Verify file download links"
+      ]
+    },
+    {
+      "name": "Admin Login Flow",
+      "steps": [
+        "Navigate to /admin/login",
+        "Enter admin credentials",
+        "Submit login form",
+        "Verify redirect to /admin/dashboard"
+      ]
+    },
+    {
+      "name": "Admin Order Management",
+      "steps": [
+        "Login as admin",
+        "View all orders",
+        "Filter by status",
+        "Update order status (bulk and individual)",
+        "Download files",
+        "Verify statistics display"
+      ]
+    },
+    {
+      "name": "Mobile Responsiveness",
+      "steps": [
+        "Test on mobile viewport (375px)",
+        "Verify navbar responsiveness",
+        "Verify button sizing",
+        "Verify form layouts",
+        "Verify order cards"
+      ]
+    }
+  ],
+  "criticalPaths": [
+    "Student can register and login",
+    "Student can upload multiple files",
+    "Orders are grouped correctly",
+    "Admin can manage orders",
+    "Files auto-delete after 24 hours"
+  ],
+  "performanceTargets": {
+    "pageLoadTime": "< 2 seconds",
+    "fileUploadTime": "< 5 seconds per file",
+    "apiResponseTime": "< 500ms"
+  }
+}

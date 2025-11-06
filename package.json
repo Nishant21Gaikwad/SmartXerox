@@ -1,0 +1,24 @@
+{
+  "name": "smartxerox",
+  "version": "1.0.0",
+  "description": "Digital print ordering system for college students and Xerox owners",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm run build"
+  },
+  "keywords": [
+    "xerox",
+    "printing",
+    "college",
+    "document-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
