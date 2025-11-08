@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'http://localhost:5173', // Development fallback
+  'http://localhost:5174', // Alternative Vite port
 ];
 
 app.use(cors({
