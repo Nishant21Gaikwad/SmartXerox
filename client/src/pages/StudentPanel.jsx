@@ -52,9 +52,15 @@ const StudentPanel = () => {
       }
 
       // Validate file type
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      const allowedTypes = [
+        'application/pdf', 
+        'image/jpeg', 
+        'image/jpg', 
+        'image/png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+      ];
       if (!allowedTypes.includes(file.type)) {
-        errors.push(`${file.name}: Only PDF, JPG, and PNG files are allowed`);
+        errors.push(`${file.name}: Only PDF, JPG, PNG, and DOCX files are allowed`);
         return;
       }
 
@@ -255,14 +261,14 @@ const StudentPanel = () => {
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                  📎 Select Files (PDF, JPG, PNG - Max 10MB each)
+                  📎 Select Files (PDF, JPG, PNG, DOCX - Max 10MB each)
                 </label>
                 <input
                   id="fileInput"
                   type="file"
                   onChange={handleFileChange}
                   className="input text-sm sm:text-base"
-                  accept=".pdf,.jpg,.jpeg,.png"
+                  accept=".pdf,.jpg,.jpeg,.png,.docx"
                   multiple
                 />
                 <p className="mt-1 text-xs text-gray-500">

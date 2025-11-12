@@ -13,11 +13,17 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    const allowedTypes = [
+      'application/pdf', 
+      'image/jpeg', 
+      'image/jpg', 
+      'image/png',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only PDF, JPG, and PNG files are allowed.'));
+      cb(new Error('Invalid file type. Only PDF, JPG, PNG, and DOCX files are allowed.'));
     }
   }
 });
@@ -46,20 +52,40 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Additional file validation - check actual file type (magic numbers)
     try {
       const fileType = await fileTypeFromBuffer(file.buffer);
-      const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+      const allowedMimeTypes = [
+        'application/pdf', 
+        'image/jpeg', 
+        'image/png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+      ];
       
-      if (!fileType || !allowedMimeTypes.includes(fileType.mime)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid file format detected. Only genuine PDF, JPG, and PNG files are allowed.'
-        });
+      // Note: DOCX files might not be detected by file-type library, so we'll skip magic number validation for them
+      if (file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // For DOCX, verify it's a ZIP file (DOCX is a ZIP archive)
+        if (fileType && fileType.mime !== 'application/zip') {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid DOCX file format detected.'
+          });
+        }
+        // If it's a ZIP or detection fails, allow it (DOCX files are ZIP-based)
+      } else {
+        // For other file types, strict validation
+        if (!fileType || !allowedMimeTypes.includes(fileType.mime)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid file format detected. Only genuine PDF, JPG, PNG, and DOCX files are allowed.'
+          });
+        }
       }
     } catch (validationError) {
-      // If file-type can't detect the type, reject it
-      return res.status(400).json({
-        success: false,
-        message: 'Could not validate file type. Please ensure you are uploading a valid file.'
-      });
+      // If file-type can't detect the type, reject it (unless it's DOCX)
+      if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        return res.status(400).json({
+          success: false,
+          message: 'Could not validate file type. Please ensure you are uploading a valid file.'
+        });
+      }
     }
 
     // Generate unique filename

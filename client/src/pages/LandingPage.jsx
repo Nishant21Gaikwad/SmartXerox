@@ -233,7 +233,7 @@ const LandingPage = () => {
                     <div className="w-5 h-5 xs:w-6 xs:h-6 bg-purple-500 text-white rounded-md xs:rounded-lg flex items-center justify-center flex-shrink-0 text-xs xs:text-sm font-bold">✓</div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 text-xs xs:text-sm sm:text-base">Multiple Files</p>
-                      <p className="text-[11px] xs:text-xs sm:text-sm text-gray-600">Upload PDF, JPG, PNG files (Max 10MB each)</p>
+                      <p className="text-[11px] xs:text-xs sm:text-sm text-gray-600">Upload PDF, JPG, PNG, DOCX files (Max 10MB each)</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 xs:gap-3">
