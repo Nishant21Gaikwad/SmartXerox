@@ -130,19 +130,28 @@ const Register = () => {
 
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                Phone Number *
+                Phone Number * 
+                <span className="text-red-600 font-semibold ml-1">⚠️ Important</span>
               </label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="input text-sm sm:text-base"
+                className="input text-sm sm:text-base border-2 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
                 required
                 placeholder="10-digit phone number"
                 pattern="[0-9]{10}"
                 title="Please enter a 10-digit phone number"
               />
+              <div className="mt-1.5 sm:mt-2 p-2 sm:p-2.5 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                <p className="text-xs sm:text-sm text-yellow-800 font-medium flex items-start gap-1.5">
+                  <span className="flex-shrink-0 mt-0.5">⚠️</span>
+                  <span>
+                    <strong>Enter your correct phone number!</strong> This will be used to track your orders and for contact purposes.
+                  </span>
+                </p>
+              </div>
             </div>
 
             <div>
