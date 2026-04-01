@@ -1,0 +1,34 @@
+project_id = "smartxerox"
+
+[functions.auth-register]
+verify_jwt = false
+
+[functions.auth-login]
+verify_jwt = false
+
+[functions.auth-profile]
+verify_jwt = false
+
+[functions.orders-create]
+verify_jwt = false
+
+[functions.orders-by-phone]
+verify_jwt = false
+
+[functions.orders-delete]
+verify_jwt = false
+
+[functions.admin-login]
+verify_jwt = false
+
+[functions.admin-orders]
+verify_jwt = false
+
+[functions.admin-order-status]
+verify_jwt = false
+
+[functions.admin-stats]
+verify_jwt = false
+
+[functions.health]
+verify_jwt = false

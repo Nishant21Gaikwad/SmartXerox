@@ -24,7 +24,7 @@ SmartXerox simplifies the college Xerox process by allowing students to upload d
 ## 🛠️ Tech Stack
 
 - **Frontend**: React.js + Vite + Tailwind CSS
-- **Backend**: Node.js + Express
+- **Backend Runtime**: Supabase Edge Functions (TypeScript)
 - **Database**: Supabase PostgreSQL
 - **Storage**: Supabase Storage
 - **Scheduler**: Cron job for cleanup
@@ -83,6 +83,7 @@ smartxerox/
    SUPABASE_URL=your_supabase_url
    SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_KEY=your_supabase_service_key
+   SUPABASE_STORAGE_BUCKET=smartxerox-files
    JWT_SECRET=your_jwt_secret
    ADMIN_EMAIL=your-admin-email@domain.com
    ADMIN_PASSWORD=your-admin-password
@@ -90,7 +91,8 @@ smartxerox/
    
    Create `.env` in the `client/` folder:
    ```env
-   VITE_API_URL=http://localhost:5000
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_FUNCTIONS_URL=
    ```
 
 3. **Set up Supabase Database**
@@ -127,10 +129,10 @@ smartxerox/
 
 5. **Run the application**
    
-   Terminal 1 (Backend):
+   Terminal 1 (Supabase Functions - local):
    ```bash
-   cd server
-   npm run dev
+   supabase start
+   supabase functions serve --env-file supabase/.env.local
    ```
    
    Terminal 2 (Frontend):
@@ -141,7 +143,7 @@ smartxerox/
 
 6. **Access the application**
    - Frontend: http://localhost:5173
-   - Backend: http://localhost:5000
+   - Functions: http://127.0.0.1:54321/functions/v1
 
 ## 📡 API Endpoints
 

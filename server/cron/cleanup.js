@@ -1,5 +1,6 @@
 import cron from 'node-cron';
 import { supabaseAdmin } from '../services/supabaseClient.js';
+const storageBucket = process.env.SUPABASE_STORAGE_BUCKET || 'smartxerox-files';
 
 // Logger utility - only logs in development or when errors occur
 const log = (message, data = null) => {
@@ -42,7 +43,7 @@ export const cleanupExpiredOrders = async () => {
     const filePaths = expiredOrders.map(order => order.file_path);
     const { error: storageError } = await supabaseAdmin
       .storage
-      .from('smartxerox-files')
+      .from(storageBucket)
       .remove(filePaths);
 
     if (storageError) {

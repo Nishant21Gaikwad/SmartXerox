@@ -11,11 +11,17 @@ CREATE TABLE IF NOT EXISTS orders (
   phone_number TEXT NOT NULL,
   file_url TEXT NOT NULL,
   file_path TEXT NOT NULL,
+  note TEXT,
   copies INTEGER NOT NULL DEFAULT 1 CHECK (copies > 0),
   color_type TEXT NOT NULL CHECK (color_type IN ('B&W', 'Color')),
   status TEXT NOT NULL DEFAULT 'In Queue' CHECK (status IN ('In Queue', 'Printing', 'Ready', 'Delivered')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Lock down direct table access from public API roles.
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.orders FROM anon, authenticated;
 
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_orders_phone_number ON orders(phone_number);
@@ -28,6 +34,7 @@ COMMENT ON COLUMN orders.student_name IS 'Name of the student who placed the ord
 COMMENT ON COLUMN orders.phone_number IS 'Contact number for order tracking (10 digits)';
 COMMENT ON COLUMN orders.file_url IS 'Public URL of the uploaded file in Supabase Storage';
 COMMENT ON COLUMN orders.file_path IS 'Storage path for file deletion';
+COMMENT ON COLUMN orders.note IS 'Optional note from student to print shop owner for this specific file';
 COMMENT ON COLUMN orders.copies IS 'Number of copies to print';
 COMMENT ON COLUMN orders.color_type IS 'Print type: B&W or Color';
 COMMENT ON COLUMN orders.status IS 'Current order status';
@@ -46,6 +53,10 @@ SELECT
   SUM(copies) as total_copies
 FROM orders
 WHERE created_at > NOW() - INTERVAL '24 hours';
+
+-- Avoid elevated privileges when querying the view.
+ALTER VIEW public.order_statistics SET (security_invoker = true);
+REVOKE ALL ON TABLE public.order_statistics FROM anon, authenticated;
 
 -- Function to clean up expired orders (alternative to cron job)
 CREATE OR REPLACE FUNCTION cleanup_expired_orders()

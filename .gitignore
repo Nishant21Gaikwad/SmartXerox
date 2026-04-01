@@ -38,3 +38,6 @@ Thumbs.db
 # Uploads (development only)
 uploads/
 temp/
+
+# Supabase CLI local metadata
+supabase/.temp/

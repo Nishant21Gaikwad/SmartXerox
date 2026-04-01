@@ -4,6 +4,7 @@ import { fileTypeFromBuffer } from 'file-type';
 import { supabaseAdmin } from '../services/supabaseClient.js';
 
 const router = express.Router();
+const storageBucket = process.env.SUPABASE_STORAGE_BUCKET || 'smartxerox-files';
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
@@ -18,12 +19,14 @@ const upload = multer({
       'image/jpeg', 
       'image/jpg', 
       'image/png',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/vnd.ms-powerpoint', // .ppt
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
     ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only PDF, JPG, PNG, and DOCX files are allowed.'));
+      cb(new Error('Invalid file type. Only PDF, JPG, PNG, DOCX, PPT, and PPTX files are allowed.'));
     }
   }
 });
@@ -31,8 +34,9 @@ const upload = multer({
 // POST /api/orders - Create new order with file upload
 router.post('/', upload.single('file'), async (req, res) => {
   try {
-    const { student_name, phone_number, copies, color_type } = req.body;
+    const { student_name, phone_number, copies, color_type, note } = req.body;
     const file = req.file;
+    const orderNote = typeof note === 'string' ? note.trim().slice(0, 250) : '';
 
     // Validation
     if (!student_name || !phone_number || !copies || !color_type || !file) {
@@ -49,6 +53,13 @@ router.post('/', upload.single('file'), async (req, res) => {
       });
     }
 
+    if (orderNote.length > 250) {
+      return res.status(400).json({
+        success: false,
+        message: 'Note must be 250 characters or less'
+      });
+    }
+
     // Additional file validation - check actual file type (magic numbers)
     try {
       const fileType = await fileTypeFromBuffer(file.buffer);
@@ -56,31 +67,47 @@ router.post('/', upload.single('file'), async (req, res) => {
         'application/pdf', 
         'image/jpeg', 
         'image/png',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/vnd.ms-powerpoint', // .ppt
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
       ];
       
-      // Note: DOCX files might not be detected by file-type library, so we'll skip magic number validation for them
-      if (file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        // For DOCX, verify it's a ZIP file (DOCX is a ZIP archive)
+      // DOCX/PPTX are ZIP-based Office formats, so validate as ZIP when detectable.
+      if (
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      ) {
         if (fileType && fileType.mime !== 'application/zip') {
           return res.status(400).json({
             success: false,
-            message: 'Invalid DOCX file format detected.'
+            message: 'Invalid Office Open XML file format detected.'
           });
         }
-        // If it's a ZIP or detection fails, allow it (DOCX files are ZIP-based)
+        // If it's a ZIP or detection fails, allow it.
+      } else if (file.mimetype === 'application/vnd.ms-powerpoint') {
+        // Legacy PPT is OLE Compound File format.
+        if (fileType && fileType.mime !== 'application/x-cfb') {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid PPT file format detected.'
+          });
+        }
       } else {
         // For other file types, strict validation
         if (!fileType || !allowedMimeTypes.includes(fileType.mime)) {
           return res.status(400).json({
             success: false,
-            message: 'Invalid file format detected. Only genuine PDF, JPG, PNG, and DOCX files are allowed.'
+            message: 'Invalid file format detected. Only genuine PDF, JPG, PNG, DOCX, PPT, and PPTX files are allowed.'
           });
         }
       }
     } catch (validationError) {
-      // If file-type can't detect the type, reject it (unless it's DOCX)
-      if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      // If file-type can't detect the type, reject it (unless Office format where MIME + extension checks already passed)
+      if (
+        file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' &&
+        file.mimetype !== 'application/vnd.openxmlformats-officedocument.presentationml.presentation' &&
+        file.mimetype !== 'application/vnd.ms-powerpoint'
+      ) {
         return res.status(400).json({
           success: false,
           message: 'Could not validate file type. Please ensure you are uploading a valid file.'
@@ -97,7 +124,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Upload file to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseAdmin
       .storage
-      .from('smartxerox-files')
+      .from(storageBucket)
       .upload(filePath, file.buffer, {
         contentType: file.mimetype,
         upsert: false
@@ -114,7 +141,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     // Get public URL
     const { data: urlData } = supabaseAdmin
       .storage
-      .from('smartxerox-files')
+      .from(storageBucket)
       .getPublicUrl(filePath);
 
     // Create order in database
@@ -128,6 +155,7 @@ router.post('/', upload.single('file'), async (req, res) => {
           file_path: filePath,
           copies: parseInt(copies),
           color_type,
+          note: orderNote || null,
           status: 'In Queue'
         }
       ])
@@ -137,7 +165,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     if (orderError) {
       console.error('Order creation error:', orderError);
       // Clean up uploaded file
-      await supabaseAdmin.storage.from('smartxerox-files').remove([filePath]);
+      await supabaseAdmin.storage.from(storageBucket).remove([filePath]);
       return res.status(500).json({
         success: false,
         message: 'Failed to create order'
@@ -213,7 +241,7 @@ router.delete('/:id', async (req, res) => {
 
     // Delete file from storage
     await supabaseAdmin.storage
-      .from('smartxerox-files')
+      .from(storageBucket)
       .remove([order.file_path]);
 
     // Delete order from database

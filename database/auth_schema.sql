@@ -9,6 +9,11 @@ CREATE TABLE IF NOT EXISTS students (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Lock down direct table access from public API roles.
+ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.students FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.students FROM anon, authenticated;
+
 -- Create index on email for faster lookups
 CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
 

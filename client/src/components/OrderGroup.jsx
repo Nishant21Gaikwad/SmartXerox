@@ -185,6 +185,13 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
                   </div>
                 </div>
 
+                {order.note && (
+                  <div className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5">
+                    <p className="text-[11px] font-medium text-amber-800 mb-0.5">Note</p>
+                    <p className="text-xs text-amber-900 break-words">{order.note}</p>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   {isAdmin ? (
                     <a

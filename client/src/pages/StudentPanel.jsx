@@ -57,10 +57,12 @@ const StudentPanel = () => {
         'image/jpeg', 
         'image/jpg', 
         'image/png',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/vnd.ms-powerpoint', // .ppt
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
       ];
       if (!allowedTypes.includes(file.type)) {
-        errors.push(`${file.name}: Only PDF, JPG, PNG, and DOCX files are allowed`);
+        errors.push(`${file.name}: Only PDF, JPG, PNG, DOCX, PPT, and PPTX files are allowed`);
         return;
       }
 
@@ -69,6 +71,7 @@ const StudentPanel = () => {
         file: file,
         copies: 1,
         color_type: 'B&W',
+        note: '',
       });
     });
 
@@ -118,6 +121,7 @@ const StudentPanel = () => {
           formDataToSend.append('phone_number', formData.phone_number);
           formDataToSend.append('copies', fileItem.copies);
           formDataToSend.append('color_type', fileItem.color_type);
+          formDataToSend.append('note', fileItem.note || '');
           formDataToSend.append('file', fileItem.file);
 
           const response = await ordersAPI.createOrder(formDataToSend);
@@ -261,14 +265,14 @@ const StudentPanel = () => {
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                  📎 Select Files (PDF, JPG, PNG, DOCX - Max 10MB each)
+                  📎 Select Files (PDF, JPG, PNG, DOCX, PPT, PPTX - Max 10MB each)
                 </label>
                 <input
                   id="fileInput"
                   type="file"
                   onChange={handleFileChange}
                   className="input text-sm sm:text-base"
-                  accept=".pdf,.jpg,.jpeg,.png,.docx"
+                  accept=".pdf,.jpg,.jpeg,.png,.docx,.ppt,.pptx"
                   multiple
                 />
                 <p className="mt-1 text-xs text-gray-500">
@@ -334,6 +338,20 @@ const StudentPanel = () => {
                             <option value="Color">Color</option>
                           </select>
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">Note for Xerox Shop (optional)</label>
+                        <textarea
+                          value={fileItem.note}
+                          onChange={(e) => updateFileSettings(fileItem.id, 'note', e.target.value.slice(0, 250))}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
+                          rows="2"
+                          placeholder="Example: Print back-to-back, staple this file, or urgent by 5 PM"
+                        />
+                        <p className="text-[11px] text-gray-500 mt-1 text-right">
+                          {fileItem.note.length}/250
+                        </p>
                       </div>
                     </div>
                   ))}
