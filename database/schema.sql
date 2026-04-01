@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS orders (
   phone_number TEXT NOT NULL,
   file_url TEXT NOT NULL,
   file_path TEXT NOT NULL,
+  file_size_bytes BIGINT,
   note TEXT,
   copies INTEGER NOT NULL DEFAULT 1 CHECK (copies > 0),
   color_type TEXT NOT NULL CHECK (color_type IN ('B&W', 'Color')),
@@ -34,6 +35,7 @@ COMMENT ON COLUMN orders.student_name IS 'Name of the student who placed the ord
 COMMENT ON COLUMN orders.phone_number IS 'Contact number for order tracking (10 digits)';
 COMMENT ON COLUMN orders.file_url IS 'Public URL of the uploaded file in Supabase Storage';
 COMMENT ON COLUMN orders.file_path IS 'Storage path for file deletion';
+COMMENT ON COLUMN orders.file_size_bytes IS 'Uploaded file size in bytes (used for daily usage analytics)';
 COMMENT ON COLUMN orders.note IS 'Optional note from student to print shop owner for this specific file';
 COMMENT ON COLUMN orders.copies IS 'Number of copies to print';
 COMMENT ON COLUMN orders.color_type IS 'Print type: B&W or Color';

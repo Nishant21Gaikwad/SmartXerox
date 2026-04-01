@@ -1,5 +1,6 @@
+import { getBearerToken, verifyToken } from '../_shared/auth.ts';
 import { handleOptions } from '../_shared/cors.ts';
-import { badRequest, jsonResponse, notFound, serverError } from '../_shared/response.ts';
+import { badRequest, forbidden, jsonResponse, notFound, serverError, unauthorized } from '../_shared/response.ts';
 import { env } from '../_shared/env.ts';
 import { supabaseAdmin } from '../_shared/supabase.ts';
 
@@ -15,6 +16,22 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const token = getBearerToken(req.headers.get('authorization'));
+    if (!token) {
+      return unauthorized('Authentication required', origin);
+    }
+
+    let payload;
+    try {
+      payload = await verifyToken(token);
+    } catch {
+      return unauthorized('Invalid or expired token', origin);
+    }
+
+    if (payload.role !== 'admin') {
+      return forbidden('Admin access required', origin);
+    }
+
     const url = new URL(req.url);
     const id = url.searchParams.get('id')?.trim() ?? '';
 

@@ -153,6 +153,7 @@ router.post('/', upload.single('file'), async (req, res) => {
           phone_number,
           file_url: urlData.publicUrl,
           file_path: filePath,
+          file_size_bytes: file.size,
           copies: parseInt(copies),
           color_type,
           note: orderNote || null,

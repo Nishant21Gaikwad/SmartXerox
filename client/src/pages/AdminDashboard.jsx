@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminAPI } from '../services/api';
+import { adminAPI, ordersAPI } from '../services/api';
 import Navbar from '../components/Navbar';
 import OrderGroup from '../components/OrderGroup';
 
@@ -63,6 +63,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteOrder = async (orderId) => {
+    const confirmed = window.confirm('Delete this file and order permanently?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await ordersAPI.deleteOrder(orderId);
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+      fetchStats();
+    } catch (err) {
+      setError('Failed to delete order');
+    }
+  };
+
   // Make status update available globally for OrderGroup component
   useEffect(() => {
     window.updateOrderStatus = handleStatusUpdate;
@@ -86,6 +101,23 @@ const AdminDashboard = () => {
     });
   };
 
+  const formatBytes = (bytes) => {
+    const safeBytes = Number(bytes || 0);
+    if (safeBytes <= 0) return '0 B';
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let size = safeBytes;
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex += 1;
+    }
+
+    const fixed = unitIndex === 0 ? 0 : 2;
+    return `${size.toFixed(fixed)} ${units[unitIndex]}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar isAdmin={true} onLogout={handleLogout} />
@@ -95,7 +127,7 @@ const AdminDashboard = () => {
 
         {/* Statistics Cards */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div className="card">
               <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Orders</h3>
               <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.total}</p>
@@ -111,6 +143,11 @@ const AdminDashboard = () => {
             <div className="card">
               <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Copies</h3>
               <p className="text-2xl sm:text-3xl font-bold text-purple-600">{stats.totalCopies}</p>
+            </div>
+            <div className="card">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Today Upload Size</h3>
+              <p className="text-xl sm:text-2xl font-bold text-amber-600">{formatBytes(stats.todayUploadBytes)}</p>
+              <p className="text-[11px] text-gray-500 mt-1">Resets daily (IST)</p>
             </div>
           </div>
         )}
@@ -150,7 +187,7 @@ const AdminDashboard = () => {
           </div>
         ) : orders.length > 0 ? (
           <div className="space-y-3 sm:space-y-4">
-            <OrderGroup orders={orders} showDelete={false} isAdmin={true} />
+            <OrderGroup orders={orders} onDelete={handleDeleteOrder} showDelete={true} isAdmin={true} />
           </div>
         ) : (
           <div className="card text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">

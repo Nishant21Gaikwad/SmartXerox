@@ -7,6 +7,8 @@ type OrderRow = {
   status: 'In Queue' | 'Printing' | 'Ready' | 'Delivered';
   color_type: 'B&W' | 'Color';
   copies: number;
+  file_size_bytes: number | null;
+  created_at: string;
 };
 
 Deno.serve(async (req) => {
@@ -39,7 +41,7 @@ Deno.serve(async (req) => {
 
     const { data, error } = await supabaseAdmin
       .from('orders')
-      .select('status, color_type, copies');
+      .select('status, color_type, copies, file_size_bytes, created_at');
 
     if (error) {
       console.error('admin-stats error', error);
@@ -47,6 +49,28 @@ Deno.serve(async (req) => {
     }
 
     const rows = (data ?? []) as OrderRow[];
+
+    // Business day window in IST (UTC+05:30), so daily total resets at IST midnight.
+    const istOffsetMs = 5.5 * 60 * 60 * 1000;
+    const now = new Date();
+    const nowInIst = new Date(now.getTime() + istOffsetMs);
+    const startOfIstDayUtc = new Date(Date.UTC(
+      nowInIst.getUTCFullYear(),
+      nowInIst.getUTCMonth(),
+      nowInIst.getUTCDate(),
+      0,
+      0,
+      0,
+      0,
+    ) - istOffsetMs);
+
+    const todayUploadBytes = rows.reduce((sum, row) => {
+      const createdAt = new Date(row.created_at);
+      if (Number.isNaN(createdAt.getTime()) || createdAt < startOfIstDayUtc) {
+        return sum;
+      }
+      return sum + Number(row.file_size_bytes || 0);
+    }, 0);
 
     const stats = {
       total: rows.length,
@@ -61,6 +85,7 @@ Deno.serve(async (req) => {
         Color: rows.filter((row) => row.color_type === 'Color').length,
       },
       totalCopies: rows.reduce((sum, row) => sum + Number(row.copies || 0), 0),
+      todayUploadBytes,
     };
 
     return jsonResponse({ success: true, data: stats }, 200, origin);

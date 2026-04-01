@@ -135,6 +135,7 @@ Deno.serve(async (req) => {
         phone_number: phoneNumber,
         file_url: publicUrlData.publicUrl,
         file_path: filePath,
+        file_size_bytes: fileBuffer.byteLength,
         copies,
         color_type: colorType,
         note: note || null,
