@@ -1,7 +1,6 @@
 import { handleOptions } from '../_shared/cors.ts';
 import { badRequest, jsonResponse, serverError } from '../_shared/response.ts';
-import { supabaseAdmin } from '../_shared/supabase.ts';
-import { signToken } from '../_shared/auth.ts';
+import { supabaseAdmin, supabaseAnon } from '../_shared/supabase.ts';
 import bcrypt from 'npm:bcryptjs@2.4.3';
 
 Deno.serve(async (req) => {
@@ -54,6 +53,23 @@ Deno.serve(async (req) => {
       return badRequest('Phone number already registered', origin);
     }
 
+    const redirectTo = origin && /^https?:\/\//i.test(origin) ? origin : undefined;
+
+    const { data: signupData, error: signupError } = await supabaseAnon.auth.signUp({
+      email,
+      password,
+      options: redirectTo ? { emailRedirectTo: redirectTo } : undefined,
+    });
+
+    if (signupError) {
+      console.error('supabase sign up error', signupError);
+      return badRequest(signupError.message || 'Unable to start email verification', origin);
+    }
+
+    if (!signupData?.user?.id) {
+      return badRequest('Unable to create auth account', origin);
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const { data: createdUser, error: createError } = await supabaseAdmin
@@ -69,16 +85,21 @@ Deno.serve(async (req) => {
 
     if (createError || !createdUser) {
       console.error('create user error', createError);
+      // Roll back auth account if profile row creation failed.
+      await supabaseAdmin.auth.admin.deleteUser(signupData.user.id);
       return serverError('Failed to create user', origin);
     }
 
-    const token = await signToken({ id: createdUser.id, email: createdUser.email, role: 'student' }, '7d');
-
     return jsonResponse({
       success: true,
-      message: 'Registration successful',
-      token,
-      user: createdUser,
+      message: 'Registration successful. Please verify your email before logging in.',
+      requiresEmailVerification: true,
+      user: {
+        id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        phone: createdUser.phone,
+      },
     }, 201, origin);
   } catch (error) {
     console.error('auth-register error', error);

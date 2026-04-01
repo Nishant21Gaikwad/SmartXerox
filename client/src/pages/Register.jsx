@@ -63,7 +63,7 @@ const Register = () => {
       });
 
       if (response.success) {
-        setSuccess('Registration successful! Redirecting to login...');
+        setSuccess('Registration successful! Please verify your email, then login. Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
         }, 2000);

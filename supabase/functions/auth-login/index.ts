@@ -39,6 +39,24 @@ Deno.serve(async (req) => {
       return unauthorized('Invalid email or password', origin);
     }
 
+    const { data: listedUsers, error: authUserError } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000,
+    });
+
+    if (authUserError) {
+      console.error('auth user lookup error', authUserError);
+      return serverError('Server error during login', origin);
+    }
+
+    const authUser = listedUsers?.users?.find((candidate) => {
+      return String(candidate.email ?? '').toLowerCase() === email;
+    });
+
+    if (!authUser?.email_confirmed_at) {
+      return unauthorized('Please verify your email before logging in', origin);
+    }
+
     const token = await signToken({ id: user.id, email: user.email, role: 'student' }, '7d');
 
     return jsonResponse({
