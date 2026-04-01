@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from 'https://esm.sh/jose@5.9.6';
+import { SignJWT, jwtVerify } from 'npm:jose@5.9.6';
 import { env } from './env.ts';
 
 const encoder = new TextEncoder();
