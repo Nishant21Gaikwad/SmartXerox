@@ -28,6 +28,24 @@ const StudentPanel = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const isPreviewableFile = (file) => {
+    return ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
+  };
+
+  const handlePreviewFile = (file) => {
+    if (!isPreviewableFile(file)) {
+      setError('Preview is available only for PDF, JPG, and PNG files.');
+      return;
+    }
+
+    setError('');
+    const previewUrl = URL.createObjectURL(file);
+    window.open(previewUrl, '_blank', 'noopener,noreferrer');
+
+    // Revoke shortly after opening to avoid leaking blob URLs.
+    setTimeout(() => URL.revokeObjectURL(previewUrl), 60_000);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -117,8 +135,6 @@ const StudentPanel = () => {
       for (const fileItem of filesList) {
         try {
           const formDataToSend = new FormData();
-          formDataToSend.append('student_name', formData.student_name);
-          formDataToSend.append('phone_number', formData.phone_number);
           formDataToSend.append('copies', fileItem.copies);
           formDataToSend.append('color_type', fileItem.color_type);
           formDataToSend.append('note', fileItem.note || '');
@@ -140,7 +156,7 @@ const StudentPanel = () => {
         setFilesList([]); // Clear files list
         
         // Auto-load orders for this user
-        fetchOrders(formData.phone_number);
+        fetchOrders();
         
         // Auto-hide success message after 5 seconds
         setTimeout(() => setSuccess(''), 5000);
@@ -154,12 +170,10 @@ const StudentPanel = () => {
     }
   };
 
-  const fetchOrders = async (phone) => {
-    if (!phone) return;
-    
+  const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await ordersAPI.getOrdersByPhone(phone);
+      const response = await ordersAPI.getOrdersByPhone();
       setOrders(response.data);
     } catch (err) {
       setError('Failed to fetch orders');
@@ -176,59 +190,63 @@ const StudentPanel = () => {
 
   // Auto-load orders when component mounts
   useEffect(() => {
-    if (savedUser.phone) {
-      fetchOrders(savedUser.phone);
-    }
+    fetchOrders();
   }, []);
 
   const handleDeleteOrder = async (orderId) => {
-    if (!confirm('Are you sure you want to delete this order?')) return;
+    if (!window.confirm('Are you sure you want to delete this order?')) return;
 
     try {
       await ordersAPI.deleteOrder(orderId);
       setOrders((prev) => prev.filter((order) => order.id !== orderId));
       setSuccess('Order deleted successfully');
     } catch (err) {
-      setError('Failed to delete order');
+      setError(err.response?.data?.message || 'Failed to delete order');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-shell">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
-          {/* Upload Form */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">📤 Submit New Order</h2>
-            
-            {error && (
-              <div className="mb-4 p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm whitespace-pre-line">
-                {error}
-              </div>
-            )}
+            <h1 className="section-title mb-1 text-slate-900">Student Dashboard</h1>
+            <p className="text-xs text-slate-500 sm:text-sm">Submit files, track status, and monitor your live queue.</p>
+          </div>
 
-            {success && (
-              <div className="mb-4 p-3 sm:p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
-                {success}
-              </div>
-            )}
+          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+            <button type="button" className="btn btn-primary px-3 py-1.5 text-xs sm:text-sm">
+              Orders
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/student/queue')}
+              className="btn btn-ghost px-3 py-1.5 text-xs sm:text-sm"
+            >
+              Live Queue
+            </button>
+          </div>
+        </div>
+
+        {error && <div className="info-banner error whitespace-pre-line">{error}</div>}
+        {success && <div className="info-banner success">{success}</div>}
+
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 lg:grid-cols-2">
+          <div>
+            <h2 className="section-title mb-3 text-slate-900 sm:mb-4">Submit New Order</h2>
 
             <form onSubmit={handleSubmit} className="card space-y-3 sm:space-y-4">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xs sm:text-sm font-medium text-gray-700">Your Information</h3>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="text-xs text-red-600 hover:text-red-800 px-2 py-1"
-                >
+              <div className="mb-1 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-sm">Student Profile</h3>
+                <button type="button" onClick={handleLogout} className="btn btn-ghost px-2.5 py-1.5 text-xs">
                   Logout
                 </button>
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600 sm:text-sm">
                   Your Name
                 </label>
                 <input
@@ -236,14 +254,14 @@ const StudentPanel = () => {
                   name="student_name"
                   value={formData.student_name}
                   onChange={handleInputChange}
-                  className="input bg-gray-100 text-sm sm:text-base"
+                  className="input bg-slate-100"
                   disabled
                   placeholder="Enter your name"
                 />
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600 sm:text-sm">
                   Phone Number
                 </label>
                 <input
@@ -251,7 +269,7 @@ const StudentPanel = () => {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
-                  className="input bg-gray-100 text-sm sm:text-base"
+                  className="input bg-slate-100"
                   disabled
                   placeholder="Enter your phone number"
                   pattern="[0-9]{10}"
@@ -259,80 +277,76 @@ const StudentPanel = () => {
                 />
               </div>
 
-              <div className="border-t pt-3 sm:pt-4">
-                <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Add Files to Upload</h3>
-              </div>
-
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-                  📎 Select Files (PDF, JPG, PNG, DOCX, PPT, PPTX - Max 10MB each)
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-3">
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600 sm:text-sm">
+                  Add Files (PDF, JPG, PNG, DOCX, PPT, PPTX)
                 </label>
                 <input
                   id="fileInput"
                   type="file"
                   onChange={handleFileChange}
-                  className="input text-sm sm:text-base"
+                  className="input"
                   accept=".pdf,.jpg,.jpeg,.png,.docx,.ppt,.pptx"
                   multiple
                 />
-                <p className="mt-1 text-xs text-gray-500">
-                  💡 You can select multiple files at once or add them one by one
-                </p>
+                <p className="mt-2 text-xs text-slate-500">Max file size: 10MB each.</p>
               </div>
 
-              {/* Files List */}
               {filesList.length > 0 && (
-                <div className="border rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-96 overflow-y-auto">
-                  <h4 className="text-sm sm:text-base font-medium text-gray-900 flex items-center justify-between">
-                    <span>Files to Upload ({filesList.length})</span>
-                    <button
-                      type="button"
-                      onClick={() => setFilesList([])}
-                      className="text-xs text-red-600 hover:text-red-800 px-2 py-1"
-                    >
-                      Clear All
+                <div className="max-h-96 space-y-2.5 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/60 p-3 sm:p-4">
+                  <h4 className="flex items-center justify-between text-sm font-bold text-slate-800 sm:text-base">
+                    <span>Draft Files ({filesList.length})</span>
+                    <button type="button" onClick={() => setFilesList([])} className="btn btn-ghost px-2 py-1 text-xs">
+                      Clear all
                     </button>
                   </h4>
-                  
+
                   {filesList.map((fileItem) => (
-                    <div key={fileItem.id} className="bg-gray-50 rounded p-2 sm:p-3 space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-medium text-gray-900 break-all">
-                            📄 {fileItem.file.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {(fileItem.file.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
+                    <div key={fileItem.id} className="rounded-2xl border border-slate-200 bg-white p-2.5 sm:p-3">
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="break-all text-xs font-bold text-slate-900 sm:text-sm">{fileItem.file.name}</p>
+                          <p className="text-xs text-slate-500">{(fileItem.file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeFile(fileItem.id)}
-                          className="flex-shrink-0 text-red-600 hover:text-red-800 text-lg"
-                          title="Remove file"
-                        >
-                          ✕
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handlePreviewFile(fileItem.file)}
+                            disabled={!isPreviewableFile(fileItem.file)}
+                            className="btn btn-ghost px-2 py-1 text-xs"
+                            title={isPreviewableFile(fileItem.file) ? 'Preview file' : 'Preview supported only for PDF, JPG, PNG'}
+                          >
+                            Preview
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(fileItem.id)}
+                            className="btn btn-ghost px-2 py-1 text-xs text-red-600 hover:border-red-200 hover:bg-red-50"
+                            title="Remove file"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Copies</label>
+                          <label className="mb-1 block text-xs font-semibold text-slate-500">Copies</label>
                           <input
                             type="number"
                             value={fileItem.copies}
                             onChange={(e) => updateFileSettings(fileItem.id, 'copies', parseInt(e.target.value))}
-                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                            className="input px-2.5 py-2 text-sm"
                             min="1"
                             max="100"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Type</label>
+                          <label className="mb-1 block text-xs font-semibold text-slate-500">Type</label>
                           <select
                             value={fileItem.color_type}
                             onChange={(e) => updateFileSettings(fileItem.id, 'color_type', e.target.value)}
-                            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                            className="input px-2.5 py-2 text-sm"
                           >
                             <option value="B&W">B&W</option>
                             <option value="Color">Color</option>
@@ -340,18 +354,16 @@ const StudentPanel = () => {
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Note for Xerox Shop (optional)</label>
+                      <div className="mt-2">
+                        <label className="mb-1 block text-xs font-semibold text-slate-500">Note (optional)</label>
                         <textarea
                           value={fileItem.note}
                           onChange={(e) => updateFileSettings(fileItem.id, 'note', e.target.value.slice(0, 250))}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
+                          className="input resize-none px-2.5 py-2 text-sm"
                           rows="2"
-                          placeholder="Example: Print back-to-back, staple this file, or urgent by 5 PM"
+                          placeholder="Example: staple this file or urgent by 5 PM"
                         />
-                        <p className="text-[11px] text-gray-500 mt-1 text-right">
-                          {fileItem.note.length}/250
-                        </p>
+                        <p className="mt-1 text-right text-[11px] text-slate-500">{fileItem.note.length}/250</p>
                       </div>
                     </div>
                   ))}
@@ -361,42 +373,37 @@ const StudentPanel = () => {
               <button
                 type="submit"
                 disabled={loading || filesList.length === 0}
-                className={`btn w-full text-sm sm:text-base ${filesList.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'btn-primary'}`}
+                className={`btn w-full ${filesList.length === 0 ? 'btn-secondary' : 'btn-primary'}`}
               >
-                {loading ? 'Uploading...' : `📤 Submit ${filesList.length > 0 ? `${filesList.length} Order(s)` : 'Orders'}`}
+                {loading ? 'Uploading...' : `Submit ${filesList.length > 0 ? `${filesList.length} Order(s)` : 'Orders'}`}
               </button>
 
               {formData.student_name && formData.phone_number && filesList.length === 0 && (
-                <p className="text-xs text-center text-gray-600">
-                  💡 Your info is saved! Just add files and submit.
-                </p>
+                <p className="text-center text-xs text-slate-500">Your profile is loaded. Add files to continue.</p>
               )}
-              
+
               {filesList.length > 0 && (
-                <p className="text-xs text-center text-green-600 font-medium">
-                  ✓ Ready to upload {filesList.length} file(s)
-                </p>
+                <p className="text-center text-xs font-bold text-emerald-700">Ready to upload {filesList.length} file(s)</p>
               )}
             </form>
           </div>
 
-          {/* My Orders */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">📋 My Orders</h2>
+            <h2 className="section-title mb-3 text-slate-900 sm:mb-4">My Orders</h2>
 
             {loading ? (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="mt-2 text-sm sm:text-base text-gray-600">Loading orders...</p>
+              <div className="card py-10 text-center">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-sky-600"></div>
+                <p className="mt-2 text-sm text-slate-500">Loading orders...</p>
               </div>
             ) : orders.length > 0 ? (
               <div className="space-y-3 sm:space-y-4">
                 <OrderGroup orders={orders} onDelete={handleDeleteOrder} showDelete={true} />
               </div>
             ) : (
-              <div className="card text-center py-6 sm:py-8 text-gray-500">
-                <p className="mb-2 text-sm sm:text-base">📭 No orders yet</p>
-                <p className="text-xs sm:text-sm">Upload files to create your first order</p>
+              <div className="card py-8 text-center text-slate-500">
+                <p className="mb-2 text-sm font-bold sm:text-base">No orders yet</p>
+                <p className="text-xs sm:text-sm">Upload files to create your first mission.</p>
               </div>
             )}
           </div>

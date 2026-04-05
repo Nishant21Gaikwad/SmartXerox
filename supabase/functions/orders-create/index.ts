@@ -1,5 +1,6 @@
+import { getBearerToken, verifyToken } from '../_shared/auth.ts';
 import { handleOptions } from '../_shared/cors.ts';
-import { badRequest, jsonResponse, serverError } from '../_shared/response.ts';
+import { badRequest, forbidden, jsonResponse, notFound, serverError, unauthorized } from '../_shared/response.ts';
 import { env } from '../_shared/env.ts';
 import { supabaseAdmin } from '../_shared/supabase.ts';
 
@@ -59,20 +60,45 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const token = getBearerToken(req.headers.get('authorization'));
+    if (!token) {
+      return unauthorized('Authentication required', origin);
+    }
+
+    let payload;
+    try {
+      payload = await verifyToken(token);
+    } catch {
+      return unauthorized('Invalid or expired token', origin);
+    }
+
+    if (payload.role !== 'student' || !payload.id) {
+      return forbidden('Student access required', origin);
+    }
+
+    const { data: student, error: studentError } = await supabaseAdmin
+      .from('students')
+      .select('name, phone')
+      .eq('id', payload.id)
+      .maybeSingle();
+
+    if (studentError) {
+      console.error('orders-create student lookup error', studentError);
+      return serverError('Failed to resolve student profile', origin);
+    }
+
+    if (!student?.name || !student?.phone) {
+      return notFound('Student profile not found', origin);
+    }
+
     const formData = await req.formData();
-    const studentName = String(formData.get('student_name') ?? '').trim();
-    const phoneNumber = String(formData.get('phone_number') ?? '').trim();
     const copiesRaw = String(formData.get('copies') ?? '').trim();
     const colorType = String(formData.get('color_type') ?? '').trim();
     const note = String(formData.get('note') ?? '').trim().slice(0, 250);
     const file = formData.get('file');
 
-    if (!studentName || !phoneNumber || !copiesRaw || !colorType || !(file instanceof File)) {
-      return badRequest('All fields are required: student_name, phone_number, copies, color_type, and file', origin);
-    }
-
-    if (!/^\d{10}$/.test(phoneNumber)) {
-      return badRequest('Phone number must be exactly 10 digits', origin);
+    if (!copiesRaw || !colorType || !(file instanceof File)) {
+      return badRequest('All fields are required: copies, color_type, and file', origin);
     }
 
     const copies = Number.parseInt(copiesRaw, 10);
@@ -131,8 +157,8 @@ Deno.serve(async (req) => {
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
-        student_name: studentName,
-        phone_number: phoneNumber,
+        student_name: student.name,
+        phone_number: student.phone,
         file_url: publicUrlData.publicUrl,
         file_path: filePath,
         file_size_bytes: fileBuffer.byteLength,

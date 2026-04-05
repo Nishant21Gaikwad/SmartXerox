@@ -28,8 +28,35 @@ Deno.serve(async (req) => {
       return unauthorized('Invalid or expired token', origin);
     }
 
-    if (payload.role !== 'admin') {
-      return forbidden('Admin access required', origin);
+    const isAdmin = payload.role === 'admin';
+    const isStudent = payload.role === 'student';
+
+    if (!isAdmin && !isStudent) {
+      return forbidden('Access denied', origin);
+    }
+
+    let studentPhone: string | null = null;
+    if (isStudent) {
+      if (!payload.id) {
+        return unauthorized('Invalid token payload', origin);
+      }
+
+      const { data: student, error: studentError } = await supabaseAdmin
+        .from('students')
+        .select('phone')
+        .eq('id', payload.id)
+        .maybeSingle();
+
+      if (studentError) {
+        console.error('orders-delete student lookup error', studentError);
+        return serverError('Failed to resolve student profile', origin);
+      }
+
+      if (!student?.phone) {
+        return notFound('Student profile not found', origin);
+      }
+
+      studentPhone = student.phone;
     }
 
     const url = new URL(req.url);
@@ -41,7 +68,7 @@ Deno.serve(async (req) => {
 
     const { data: order, error: fetchError } = await supabaseAdmin
       .from('orders')
-      .select('id, file_path')
+      .select('id, file_path, phone_number')
       .eq('id', id)
       .maybeSingle();
 
@@ -54,9 +81,15 @@ Deno.serve(async (req) => {
       return notFound('Order not found', origin);
     }
 
-    await supabaseAdmin.storage
-      .from(env.storageBucket)
-      .remove([order.file_path]);
+    if (isStudent && order.phone_number !== studentPhone) {
+      return forbidden('You can only delete your own orders', origin);
+    }
+
+    if (order.file_path) {
+      await supabaseAdmin.storage
+        .from(env.storageBucket)
+        .remove([order.file_path]);
+    }
 
     const { error: deleteError } = await supabaseAdmin
       .from('orders')

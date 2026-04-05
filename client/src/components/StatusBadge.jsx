@@ -1,15 +1,15 @@
 import React from 'react';
 
 const statusColors = {
-  'In Queue': 'bg-gray-200 text-gray-800',
-  'Printing': 'bg-blue-200 text-blue-800',
-  'Ready': 'bg-green-200 text-green-800',
-  'Delivered': 'bg-purple-200 text-purple-800',
+  'In Queue': 'border-slate-200 bg-slate-50 text-slate-700',
+  'Printing': 'border-sky-200 bg-sky-50 text-sky-700',
+  'Ready': 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  'Delivered': 'border-teal-200 bg-teal-50 text-teal-700',
 };
 
 const StatusBadge = ({ status }) => {
   return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[status] || 'bg-gray-200 text-gray-800'}`}>
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${statusColors[status] || 'border-slate-200 bg-slate-50 text-slate-700'}`}>
       {status}
     </span>
   );

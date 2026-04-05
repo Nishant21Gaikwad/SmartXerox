@@ -60,17 +60,6 @@ WHERE created_at > NOW() - INTERVAL '24 hours';
 ALTER VIEW public.order_statistics SET (security_invoker = true);
 REVOKE ALL ON TABLE public.order_statistics FROM anon, authenticated;
 
--- Function to clean up expired orders (alternative to cron job)
-CREATE OR REPLACE FUNCTION cleanup_expired_orders()
-RETURNS void
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  DELETE FROM orders 
-  WHERE created_at < NOW() - INTERVAL '24 hours';
-END;
-$$;
-
 -- Sample data (optional - for testing)
 -- Uncomment to insert test data
 /*

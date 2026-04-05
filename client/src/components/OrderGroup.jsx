@@ -41,46 +41,20 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
     groupedOrders.push(currentGroup);
   }
 
-  const formatDate = (dateString) => {
+  const formatSubmittedAt = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-IN', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     });
-  };
-
-  const getTimeRemaining = (createdAt) => {
-    const created = new Date(createdAt);
-    const expiryTime = new Date(created.getTime() + 24 * 60 * 60 * 1000);
-    const now = new Date();
-    const remaining = expiryTime - now;
-
-    if (remaining <= 0) return 'Expired';
-
-    const hours = Math.floor(remaining / (1000 * 60 * 60));
-    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-
-    return `${hours}h ${minutes}m remaining`;
-  };
-
-  const getTotalCopies = (orders) => {
-    return orders.reduce((sum, order) => sum + order.copies, 0);
-  };
-
-  const getStatusSummary = (orders) => {
-    const statuses = {};
-    orders.forEach(order => {
-      statuses[order.status] = (statuses[order.status] || 0) + 1;
-    });
-    return statuses;
   };
 
   const handleBulkStatusChange = (group, newStatus) => {
     if (!window.updateOrderStatus) return;
-    
+
     // Update all orders in the group
     group.orders.forEach(order => {
       window.updateOrderStatus(order.id, newStatus);
@@ -90,80 +64,71 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
   return (
     <>
       {groupedOrders.map((group, groupIndex) => (
-        <div key={groupIndex} className="card hover:shadow-lg transition-shadow">
-          {/* Student Header */}
-          <div className="border-b pb-2 sm:pb-3 mb-2 sm:mb-3">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-0">
+        <div key={groupIndex} className="card hover-lift animate-rise">
+          <div className="mb-3 rounded-2xl border border-slate-100 bg-white/80 p-3 sm:p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{group.student_name}</h3>
-                <p className="text-xs sm:text-sm text-gray-600">{group.phone_number}</p>
+                <h3 className="text-base font-bold text-slate-900 sm:text-lg">{group.student_name}</h3>
+                <p className="text-xs font-semibold text-slate-500 sm:text-sm">{group.phone_number}</p>
               </div>
-              <div className="text-left sm:text-right">
-                <p className="text-xs text-gray-500">Submitted</p>
-                <p className="text-xs sm:text-sm font-medium">{formatDate(group.created_at)}</p>
-                <p className="text-xs text-orange-600 font-medium mt-1">
-                  ⏱️ {getTimeRemaining(group.created_at)}
-                </p>
+              <div className="space-y-1 text-left sm:text-right">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Submitted</p>
+                <p className="text-xs font-bold text-slate-700 sm:text-sm">{formatSubmittedAt(group.created_at)}</p>
               </div>
             </div>
 
-            {/* Bulk Status Update for Admin (only for multiple files) */}
             {isAdmin && group.orders.length > 1 && (
-              <div className="mt-3 pt-3 border-t bg-blue-50 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 rounded-b-lg">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-                  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
-                    🔄 Update all {group.orders.length} files:
-                  </span>
-                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={() => handleBulkStatusChange(group, 'In Queue')}
-                      className="text-xs px-2 sm:px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-                    >
-                      In Queue
-                    </button>
-                    <button
-                      onClick={() => handleBulkStatusChange(group, 'Printing')}
-                      className="text-xs px-2 sm:px-3 py-1 bg-blue-200 hover:bg-blue-300 rounded transition-colors"
-                    >
-                      Printing
-                    </button>
-                    <button
-                      onClick={() => handleBulkStatusChange(group, 'Ready')}
-                      className="text-xs px-2 sm:px-3 py-1 bg-green-200 hover:bg-green-300 rounded transition-colors"
-                    >
-                      Ready
-                    </button>
-                    <button
-                      onClick={() => handleBulkStatusChange(group, 'Delivered')}
-                      className="text-xs px-2 sm:px-3 py-1 bg-purple-200 hover:bg-purple-300 rounded transition-colors"
-                    >
-                      Delivered
-                    </button>
-                  </div>
+              <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-600">
+                  Quick update all files
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleBulkStatusChange(group, 'In Queue')}
+                    className="btn btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    In Queue
+                  </button>
+                  <button
+                    onClick={() => handleBulkStatusChange(group, 'Printing')}
+                    className="btn btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Printing
+                  </button>
+                  <button
+                    onClick={() => handleBulkStatusChange(group, 'Ready')}
+                    className="btn btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Ready
+                  </button>
+                  <button
+                    onClick={() => handleBulkStatusChange(group, 'Delivered')}
+                    className="btn btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Delivered
+                  </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Files List */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {group.orders.map((order, orderIndex) => (
-              <div key={order.id} className="bg-gray-50 rounded-lg p-2 sm:p-3">
-                <div className="flex items-start justify-between mb-2">
+              <div key={order.id} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3 sm:p-3.5">
+                <div className="mb-2 flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs sm:text-sm font-medium text-gray-700">
+                      <span className="rounded-full bg-white px-2 py-1 text-[11px] font-bold text-slate-600 shadow-sm">
                         File {orderIndex + 1}
                       </span>
                       <StatusBadge status={order.status} />
                     </div>
                   </div>
-                  {/* Show individual dropdown only for single file or non-admin */}
                   {isAdmin && group.orders.length === 1 && (
                     <select
                       value={order.status}
                       onChange={(e) => window.updateOrderStatus && window.updateOrderStatus(order.id, e.target.value)}
-                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent ml-2"
+                      className="input ml-2 max-w-[135px] px-2.5 py-1.5 text-xs"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <option value="In Queue">In Queue</option>
@@ -174,21 +139,25 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs mb-2">
-                  <div>
-                    <span className="text-gray-600">Copies:</span>
-                    <span className="ml-1 font-medium">{order.copies}</span>
+                <div className="mb-2 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+                  <div className="rounded-xl bg-white px-2.5 py-2 soft-ring">
+                    <span className="text-slate-500">Copies:</span>
+                    <span className="ml-1 font-bold text-slate-700">{order.copies}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Type:</span>
-                    <span className="ml-1 font-medium">{order.color_type}</span>
+                  <div className="rounded-xl bg-white px-2.5 py-2 soft-ring">
+                    <span className="text-slate-500">Type:</span>
+                    <span className="ml-1 font-bold text-slate-700">{order.color_type}</span>
+                  </div>
+                  <div className="col-span-2 rounded-xl bg-white px-2.5 py-2 soft-ring sm:col-span-1">
+                    <span className="text-slate-500">At:</span>
+                    <span className="ml-1 font-bold text-slate-700">{formatSubmittedAt(order.created_at)}</span>
                   </div>
                 </div>
 
                 {order.note && (
-                  <div className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5">
-                    <p className="text-[11px] font-medium text-amber-800 mb-0.5">Note</p>
-                    <p className="text-xs text-amber-900 break-words">{order.note}</p>
+                  <div className="mb-2 rounded-xl border border-amber-200 bg-amber-50 px-2.5 py-2">
+                    <p className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-800">Note</p>
+                    <p className="break-words text-xs text-amber-900">{order.note}</p>
                   </div>
                 )}
 
@@ -197,24 +166,24 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
                     <a
                       href={order.file_url}
                       download
-                      className="text-xs btn btn-primary flex-1 text-center py-1.5 sm:py-1"
+                      className="btn btn-primary flex-1 py-1.5 text-xs sm:py-2"
                     >
-                      📥 Download
+                      Download
                     </a>
                   ) : (
                     <a
                       href={order.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs btn btn-primary flex-1 text-center py-1.5 sm:py-1"
+                      className="btn btn-primary flex-1 py-1.5 text-xs sm:py-2"
                     >
-                      📥 View
+                      View
                     </a>
                   )}
                   {showDelete && onDelete && (
                     <button
                       onClick={() => onDelete(order.id)}
-                      className="text-xs btn btn-danger py-1.5 sm:py-1 px-2 sm:px-3"
+                      className="btn btn-danger px-2.5 py-1.5 text-xs sm:px-3 sm:py-2"
                     >
                       Delete
                     </button>
@@ -227,4 +196,6 @@ const OrderGroup = ({ orders, onDelete, showDelete = true, isAdmin = false }) =>
       ))}
     </>
   );
-};export default OrderGroup;
+};
+
+export default OrderGroup;

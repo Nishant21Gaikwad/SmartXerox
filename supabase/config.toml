@@ -30,5 +30,11 @@ verify_jwt = false
 [functions.admin-stats]
 verify_jwt = false
 
+[functions.admin-delete-delivered]
+verify_jwt = false
+
+[functions.student-queue]
+verify_jwt = false
+
 [functions.health]
 verify_jwt = false

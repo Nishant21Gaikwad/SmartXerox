@@ -4,6 +4,31 @@ import { badRequest, jsonResponse, serverError, unauthorized } from '../_shared/
 import { supabaseAdmin } from '../_shared/supabase.ts';
 import { signToken } from '../_shared/auth.ts';
 
+const findAuthUserByEmail = async (email: string) => {
+  const perPage = 1000;
+  const maxPages = 50;
+
+  for (let page = 1; page <= maxPages; page += 1) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+
+    if (error) {
+      return { user: null, error };
+    }
+
+    const users = data?.users ?? [];
+    const matched = users.find((candidate) => String(candidate.email ?? '').toLowerCase() === email);
+    if (matched) {
+      return { user: matched, error: null };
+    }
+
+    if (users.length < perPage) {
+      break;
+    }
+  }
+
+  return { user: null, error: null };
+};
+
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
 
@@ -39,19 +64,12 @@ Deno.serve(async (req) => {
       return unauthorized('Invalid email or password', origin);
     }
 
-    const { data: listedUsers, error: authUserError } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
-    });
+    const { user: authUser, error: authUserError } = await findAuthUserByEmail(email);
 
     if (authUserError) {
       console.error('auth user lookup error', authUserError);
       return serverError('Server error during login', origin);
     }
-
-    const authUser = listedUsers?.users?.find((candidate) => {
-      return String(candidate.email ?? '').toLowerCase() === email;
-    });
 
     if (!authUser?.email_confirmed_at) {
       return unauthorized('Please verify your email before logging in', origin);

@@ -36,6 +36,9 @@ const AdminLogin = () => {
       const response = await adminAPI.login(credentials.email, credentials.password);
       
       if (response.success) {
+        // Ensure admin sessions never carry student credentials.
+        localStorage.removeItem('smartxerox_token');
+        localStorage.removeItem('smartxerox_user');
         localStorage.setItem('adminToken', response.data.token);
         navigate('/admin/dashboard');
       }
@@ -47,23 +50,20 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center px-3 sm:px-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">📄 SmartXerox</h1>
-          <p className="text-sm sm:text-base text-blue-100">Admin Login</p>
+    <div className="app-shell flex min-h-screen items-center justify-center px-3 py-8 sm:px-4">
+      <div className="w-full max-w-md">
+        <div className="mb-5 text-center sm:mb-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">SmartXerox</p>
+          <h1 className="mt-1 text-3xl font-extrabold text-slate-900 sm:text-4xl">Admin Command</h1>
+          <p className="mt-1 text-sm text-slate-600">Secure access for managing print operations.</p>
         </div>
 
-        <div className="card">
-          {error && (
-            <div className="mb-4 p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+        <div className="card animate-rise">
+          {error && <div className="info-banner error">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600 sm:text-sm">
                 Email Address
               </label>
               <input
@@ -71,14 +71,14 @@ const AdminLogin = () => {
                 name="email"
                 value={credentials.email}
                 onChange={handleInputChange}
-                className="input text-sm sm:text-base"
+                className="input"
                 required
                 placeholder="Enter admin email"
               />
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600 sm:text-sm">
                 Password
               </label>
               <input
@@ -86,24 +86,20 @@ const AdminLogin = () => {
                 name="password"
                 value={credentials.password}
                 onChange={handleInputChange}
-                className="input text-sm sm:text-base"
+                className="input"
                 required
                 placeholder="Enter your password"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full text-sm sm:text-base"
-            >
-              {loading ? 'Logging in...' : '🔐 Login'}
+            <button type="submit" disabled={loading} className="btn btn-primary w-full">
+              {loading ? 'Logging in...' : 'Enter Dashboard'}
             </button>
           </form>
 
-          <div className="mt-4 sm:mt-6 text-center">
-            <a href="/" className="text-xs sm:text-sm text-blue-600 hover:text-blue-800">
-              ← Back to Student Panel
+          <div className="mt-5 text-center">
+            <a href="/" className="text-xs font-bold text-brand hover:text-sky-700 sm:text-sm">
+              Back to Student Portal
             </a>
           </div>
         </div>

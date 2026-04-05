@@ -5,7 +5,6 @@ import rateLimit from 'express-rate-limit';
 import orderRoutes from './routes/orders.js';
 import adminRoutes from './routes/admin.js';
 import authRoutes from './routes/auth.js';
-import { startCleanupJob } from './cron/cleanup.js';
 
 dotenv.config();
 
@@ -91,12 +90,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start cleanup cron job
-startCleanupJob();
-
 app.listen(PORT, () => {
   console.log(`🚀 SmartXerox server running on port ${PORT}`);
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`🧹 Cleanup job scheduled to run every hour`);
-  }
 });

@@ -181,6 +181,32 @@ app.use((err, req, res, next) => {
 
 ---
 
+## 🧹 24-Hour Deletion Reliability Update (April 2026)
+
+- Added shared Edge cleanup helper at `supabase/functions/_shared/cleanup.ts`.
+- Added secure cleanup trigger endpoint at `supabase/functions/cleanup-expired/index.ts`.
+- Auto-invoked cleanup on active endpoints:
+  - `orders-create`
+  - `orders-by-phone`
+  - `admin-orders`
+  - `admin-stats`
+- Added support for scheduler secret via env variable:
+  - `CLEANUP_CRON_SECRET` (or `APP_CLEANUP_CRON_SECRET`)
+
+### Recommended Scheduler Setup
+
+Schedule hourly POST requests to:
+
+`https://<project-ref>.supabase.co/functions/v1/cleanup-expired`
+
+With header:
+
+`x-cleanup-secret: <your-cleanup-secret>`
+
+This ensures 24-hour deletion runs even when there is no frontend traffic.
+
+---
+
 ## 🚀 Deployment Ready Checklist
 
 ### Pre-Deployment Tasks

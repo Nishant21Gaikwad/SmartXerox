@@ -22,10 +22,16 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const adminToken = localStorage.getItem('adminToken');
   const userToken = localStorage.getItem('smartxerox_token');
-  const token = adminToken || userToken;
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isAdminRoute = pathname.startsWith('/admin');
+  const token = isAdminRoute ? adminToken : userToken;
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  } else if (config.headers?.Authorization) {
+    delete config.headers.Authorization;
   }
+
   return config;
 });
 
@@ -63,9 +69,9 @@ export const ordersAPI = {
   },
 
   // Get orders by phone number
-  getOrdersByPhone: async (phoneNumber) => {
+  getOrdersByPhone: async (phoneNumber = null) => {
     const response = await api.get('/orders-by-phone', {
-      params: { phone: phoneNumber },
+      params: phoneNumber ? { phone: phoneNumber } : undefined,
     });
     return response.data;
   },
@@ -75,6 +81,12 @@ export const ordersAPI = {
     const response = await api.delete('/orders-delete', {
       params: { id: orderId },
     });
+    return response.data;
+  },
+
+  // Get privacy-safe live queue data for logged-in student
+  getStudentQueue: async () => {
+    const response = await api.get('/student-queue');
     return response.data;
   },
 };
@@ -104,6 +116,12 @@ export const adminAPI = {
   // Get statistics (admin only)
   getStats: async () => {
     const response = await api.get('/admin-stats');
+    return response.data;
+  },
+
+  // Delete all delivered orders (admin only)
+  deleteDeliveredOrders: async () => {
+    const response = await api.delete('/admin-delete-delivered');
     return response.data;
   },
 };

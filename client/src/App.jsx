@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import StudentQueue from './pages/StudentQueue';
 import './index.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/student" element={<StudentPanel />} />
+        <Route path="/student/queue" element={<StudentQueue />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
